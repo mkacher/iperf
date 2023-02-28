@@ -348,6 +348,12 @@ const char report_bw_header[] =
 const char report_bw_header_bidir[] =
 "[ ID][Role] Interval           Transfer     Bitrate\n";
 
+const char report_pktcnt_bw_header[] =
+"[ ID] Interval           Transfer     Pkt_Count     Bitrate\n";
+
+const char report_pktcnt_bw_header_bidir[] =
+"[ ID][Role] Interval           Transfer     Pkt_Count     Bitrate\n";
+
 const char report_bw_retrans_header[] =
 "[ ID] Interval           Transfer     Bitrate         Retr\n";
 
@@ -366,6 +372,12 @@ const char report_bw_udp_header[] =
 const char report_bw_udp_header_bidir[] =
 "[ ID][Role] Interval           Transfer     Bitrate         Jitter    Lost/Total Datagrams\n";
 
+const char report_pktcnt_bw_udp_header[] =
+"[ ID] Interval           Transfer     Pkt_Count     Bitrate         Jitter    Lost/Total Datagrams\n";
+
+const char report_pktcnt_bw_udp_header_bidir[] =
+"[ ID][Role] Interval           Transfer     Pkt_Count     Bitrate         Jitter    Lost/Total Datagrams\n";
+
 const char report_bw_udp_sender_header[] =
 "[ ID] Interval           Transfer     Bitrate         Total Datagrams\n";
 
@@ -375,6 +387,9 @@ const char report_bw_udp_sender_header_bidir[] =
 const char report_bw_format[] =
 "[%3d]%s %6.2f-%-6.2f sec  %ss  %ss/sec                  %s\n";
 
+const char report_pktcnt_bw_format[] =
+"[%3d]%s %6.2f-%-6.2f sec  %ss  %s     %ss/sec                  %s\n";
+
 const char report_bw_retrans_format[] =
 "[%3d]%s %6.2f-%-6.2f sec  %ss  %ss/sec  %3u             %s\n";
 
@@ -383,6 +398,9 @@ const char report_bw_retrans_cwnd_format[] =
 
 const char report_bw_udp_format[] =
 "[%3d]%s %6.2f-%-6.2f sec  %ss  %ss/sec  %5.3f ms  %d/%d (%.2g%%)  %s\n";
+
+const char report_pktcnt_bw_udp_format[] =
+"[%3d]%s %6.2f-%-6.2f sec  %ss  %s     %ss/sec  %5.3f ms  %d/%d (%.2g%%)  %s\n";
 
 const char report_bw_udp_sender_format[] =
 "[%3d]%s %6.2f-%-6.2f sec  %ss  %ss/sec %s %d  %s\n";

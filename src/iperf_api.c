@@ -3389,12 +3389,14 @@ iperf_print_intermediate(struct iperf_test *test)
 
     for (current_mode = lower_mode; current_mode <= upper_mode; ++current_mode) {
         char ubuf[UNIT_LEN];
+        char pbuf[UNIT_LEN]; //packet count
         char nbuf[UNIT_LEN];
         char mbuf[UNIT_LEN];
         char zbuf[] = "          ";
 
         iperf_size_t bytes = 0;
         double bandwidth;
+        double pktcnt;
         int retransmits = 0;
         double start_time, end_time;
 
@@ -3462,6 +3464,8 @@ iperf_print_intermediate(struct iperf_test *test)
 	    unit_snprintf(ubuf, UNIT_LEN, (double) bytes, 'A');
 	    bandwidth = (double) bytes / (double) irp->interval_duration;
 	    unit_snprintf(nbuf, UNIT_LEN, bandwidth, test->settings->unit_format);
+        pktcnt = (double) test->blocks_received;
+        snprintf(pbuf, UNIT_LEN, "%4.0f", pktcnt);
 
 	    iperf_time_diff(&sp->result->start_time,&irp->interval_start_time, &temp_time);
 	    start_time = iperf_time_in_secs(&temp_time);
@@ -3543,15 +3547,15 @@ iperf_print_results(struct iperf_test *test)
 	    }
 	    else {
 	        if (test->bidirectional)
-	            iperf_printf(test, "%s", report_bw_header_bidir);
+	            iperf_printf(test, "%s", report_pktcnt_bw_header_bidir);
 	        else
-	            iperf_printf(test, "%s", report_bw_header);
+	            iperf_printf(test, "%s", report_pktcnt_bw_header);
 	    }
 	} else {
 	    if (test->bidirectional)
-	        iperf_printf(test, "%s", report_bw_udp_header_bidir);
+	        iperf_printf(test, "%s", report_pktcnt_bw_udp_header_bidir);
 	    else
-	        iperf_printf(test, "%s", report_bw_udp_header);
+	        iperf_printf(test, "%s", report_pktcnt_bw_udp_header);
 	}
     }
 
@@ -3586,6 +3590,7 @@ iperf_print_results(struct iperf_test *test)
         int sender_total_packets = 0, receiver_total_packets = 0; /* running total */
         char ubuf[UNIT_LEN];
         char nbuf[UNIT_LEN];
+        char pbuf[UNIT_LEN];
         struct stat sb;
         char sbuf[UNIT_LEN];
         struct iperf_stream *sp = NULL;
@@ -3595,6 +3600,7 @@ iperf_print_results(struct iperf_test *test)
         double sender_time = 0.0, receiver_time = 0.0;
     struct iperf_time temp_time;
         double bandwidth;
+        double pktcnt;
 
         char mbuf[UNIT_LEN];
         int stream_must_be_sender = current_mode * current_mode;
@@ -3695,6 +3701,8 @@ iperf_print_results(struct iperf_test *test)
                     bandwidth = 0.0;
                 }
                 unit_snprintf(nbuf, UNIT_LEN, bandwidth, test->settings->unit_format);
+                pktcnt = (double) test->blocks_received;
+                snprintf(pbuf, UNIT_LEN, "%4.0f", pktcnt);
                 if (test->protocol->id == Ptcp || test->protocol->id == Psctp) {
                     if (test->sender_has_retransmits) {
                         /* Sender summary, TCP and SCTP with retransmits. */
@@ -3718,7 +3726,7 @@ iperf_print_results(struct iperf_test *test)
                                     iperf_printf(test, report_sender_not_available_format, sp->socket);
                             }
                             else {
-                                iperf_printf(test, report_bw_format, sp->socket, mbuf, start_time, sender_time, ubuf, nbuf, report_sender);
+                                iperf_printf(test, report_pktcnt_bw_format, sp->socket, mbuf, start_time, sender_time, ubuf, pbuf, nbuf, report_sender);
                             }
                     }
                 } else {
@@ -3762,7 +3770,7 @@ iperf_print_results(struct iperf_test *test)
                                 iperf_printf(test, report_sender_not_available_format, sp->socket);
                         }
                         else {
-                            iperf_printf(test, report_bw_udp_format, sp->socket, mbuf, start_time, sender_time, ubuf, nbuf, 0.0, 0, (sender_packet_count - sp->omitted_packet_count), (double) 0, report_sender);
+                            iperf_printf(test, report_pktcnt_bw_udp_format, sp->socket, mbuf, start_time, sender_time, ubuf, pbuf, nbuf, 0.0, 0, (sender_packet_count - sp->omitted_packet_count), (double) 0, report_sender);
                         }
                         if ((sp->outoforder_packets - sp->omitted_outoforder_packets) > 0)
                           iperf_printf(test, report_sum_outoforder, mbuf, start_time, sender_time, (sp->outoforder_packets - sp->omitted_outoforder_packets));
@@ -3809,7 +3817,7 @@ iperf_print_results(struct iperf_test *test)
                                 iperf_printf(test, report_receiver_not_available_format, sp->socket);
                         }
                         else {
-                            iperf_printf(test, report_bw_format, sp->socket, mbuf, start_time, receiver_time, ubuf, nbuf, report_receiver);
+                            iperf_printf(test, report_pktcnt_bw_format, sp->socket, mbuf, start_time, receiver_time, ubuf, pbuf, nbuf, report_receiver);
                         }
                 }
                 else {
@@ -3831,7 +3839,7 @@ iperf_print_results(struct iperf_test *test)
                                 iperf_printf(test, report_receiver_not_available_format, sp->socket);
                         }
                         else {
-                            iperf_printf(test, report_bw_udp_format, sp->socket, mbuf, start_time, receiver_time, ubuf, nbuf, sp->jitter * 1000.0, (sp->cnt_error - sp->omitted_cnt_error), (receiver_packet_count - sp->omitted_packet_count), lost_percent, report_receiver);
+                            iperf_printf(test, report_pktcnt_bw_udp_format, sp->socket, mbuf, start_time, receiver_time, ubuf, pbuf, nbuf, sp->jitter * 1000.0, (sp->cnt_error - sp->omitted_cnt_error), (receiver_packet_count - sp->omitted_packet_count), lost_percent, report_receiver);
                         }
                     }
                 }
@@ -4072,6 +4080,7 @@ print_interval_results(struct iperf_test *test, struct iperf_stream *sp, cJSON *
 {
     char ubuf[UNIT_LEN];
     char nbuf[UNIT_LEN];
+    char pbuf[UNIT_LEN];
     char cbuf[UNIT_LEN];
     char mbuf[UNIT_LEN];
     char zbuf[] = "          ";
@@ -4079,6 +4088,7 @@ print_interval_results(struct iperf_test *test, struct iperf_stream *sp, cJSON *
     struct iperf_time temp_time;
     struct iperf_interval_results *irp = NULL;
     double bandwidth, lost_percent;
+    double pktcnt; 
 
     if (test->mode == BIDIRECTIONAL) {
         sprintf(mbuf, "[%s-%s]", sp->sender?"TX":"RX", test->role == 'c'?"C":"S");
@@ -4109,18 +4119,18 @@ print_interval_results(struct iperf_test *test, struct iperf_stream *sp, cJSON *
 		    }
 		    else {
 	                if (test->bidirectional)
-	                    iperf_printf(test, "%s", report_bw_header_bidir);
+	                    iperf_printf(test, "%s", report_pktcnt_bw_header_bidir);
 	                else
-	                    iperf_printf(test, "%s", report_bw_header);
+	                    iperf_printf(test, "%s", report_pktcnt_bw_header);
 	            }
 		} else {
 		    if (test->mode == SENDER) {
 		        iperf_printf(test, "%s", report_bw_udp_sender_header);
 		    } else if (test->mode == RECEIVER){
-		        iperf_printf(test, "%s", report_bw_udp_header);
+		        iperf_printf(test, "%s", report_pktcnt_bw_udp_header);
 		    } else {
 		        /* BIDIRECTIONAL */
-		        iperf_printf(test, "%s", report_bw_udp_header_bidir);
+		        iperf_printf(test, "%s", report_pktcnt_bw_udp_header_bidir);
 		    }
 		}
 	    } else if (test->num_streams > 1)
@@ -4135,7 +4145,9 @@ print_interval_results(struct iperf_test *test, struct iperf_stream *sp, cJSON *
     else {
 	bandwidth = 0.0;
     }
+    pktcnt = (double) test->blocks_received;
     unit_snprintf(nbuf, UNIT_LEN, bandwidth, test->settings->unit_format);
+    snprintf(pbuf, UNIT_LEN, "%4.0f", pktcnt);
 
     iperf_time_diff(&sp->result->start_time, &irp->interval_start_time, &temp_time);
     st = iperf_time_in_secs(&temp_time);
@@ -4156,7 +4168,7 @@ print_interval_results(struct iperf_test *test, struct iperf_stream *sp, cJSON *
 	    if (test->json_output)
 		cJSON_AddItemToArray(json_interval_streams, iperf_json_printf("socket: %d  start: %f  end: %f  seconds: %f  bytes: %d  bits_per_second: %f  omitted: %b sender: %b", (int64_t) sp->socket, (double) st, (double) et, (double) irp->interval_duration, (int64_t) irp->bytes_transferred, bandwidth * 8, irp->omitted, sp->sender));
 	    else
-		iperf_printf(test, report_bw_format, sp->socket, mbuf, st, et, ubuf, nbuf, irp->omitted?report_omitted:"");
+		iperf_printf(test, report_pktcnt_bw_format, sp->socket, mbuf, st, et, ubuf, pbuf, nbuf, irp->omitted?report_omitted:"");
 	}
     } else {
 	/* Interval, UDP. */
@@ -4175,7 +4187,7 @@ print_interval_results(struct iperf_test *test, struct iperf_stream *sp, cJSON *
 	    if (test->json_output)
 		cJSON_AddItemToArray(json_interval_streams, iperf_json_printf("socket: %d  start: %f  end: %f  seconds: %f  bytes: %d  bits_per_second: %f  jitter_ms: %f  lost_packets: %d  packets: %d  lost_percent: %f  omitted: %b sender: %b", (int64_t) sp->socket, (double) st, (double) et, (double) irp->interval_duration, (int64_t) irp->bytes_transferred, bandwidth * 8, (double) irp->jitter * 1000.0, (int64_t) irp->interval_cnt_error, (int64_t) irp->interval_packet_count, (double) lost_percent, irp->omitted, sp->sender));
 	    else
-		iperf_printf(test, report_bw_udp_format, sp->socket, mbuf, st, et, ubuf, nbuf, irp->jitter * 1000.0, irp->interval_cnt_error, irp->interval_packet_count, lost_percent, irp->omitted?report_omitted:"");
+		iperf_printf(test, report_pktcnt_bw_udp_format, sp->socket, mbuf, st, et, ubuf, pbuf, nbuf, irp->jitter * 1000.0, irp->interval_cnt_error, irp->interval_packet_count, lost_percent, irp->omitted?report_omitted:"");
 	}
     }
 
